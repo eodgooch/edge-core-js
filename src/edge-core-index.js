@@ -406,6 +406,28 @@ export type EdgeExchangeCurrencies = {
   }
 }
 
+export type EdgeExchangeQuoteOptions = {
+  fromCurrencyCode: string,
+  fromWallet: EdgeCurrencyWallet,
+  nativeAmount: string,
+  quoteFor: 'from' | 'to',
+  toCurrencyCode: string,
+  toWallet: EdgeCurrencyWallet
+}
+
+export type EdgeExchangeQuote = {
+  +expirationDate: Date,
+  +fromNativeAmount: string,
+  +toNativeAmount: string,
+
+  +exchangeService: string,
+  +quoteId: string,
+  +quoteUri: string,
+
+  approve(): Promise<EdgeTransaction>,
+  close(): Promise<mixed>
+}
+
 export type EdgeAccountEvents = {}
 
 export type EthererumTransaction = {
@@ -514,7 +536,8 @@ export type EdgeAccount = {
   ): Promise<string>,
 
   // Exchange support:
-  getExchangeCurrencies(): Promise<EdgeExchangeCurrencies>
+  getExchangeCurrencies(): Promise<EdgeExchangeCurrencies>,
+  getExchangeQuote(opts: EdgeExchangeQuoteOptions): Promise<EdgeExchangeQuote>
 }
 
 // edge login types ---------------------------------------------------

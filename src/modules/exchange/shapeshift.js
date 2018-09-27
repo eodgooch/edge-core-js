@@ -1,7 +1,14 @@
 // @flow
 
 import { div, mul } from 'biggystring'
+import { bridgifyObject, close } from 'yaob'
 
+import type {
+  EdgeCoinExchangeQuote,
+  EdgeCurrencyWallet,
+  EdgeExchangeQuote,
+  EdgeTransaction
+} from '../../edge-core-index.js'
 import { getCurrencyMultiplier } from '../currency/currency-selectors'
 import type { ApiInput } from '../root.js'
 
@@ -171,4 +178,40 @@ export function makeShapeshiftApi (ai: ApiInput) {
       return replyJson
     }
   }
+}
+
+export function upgradeQuote (
+  fromWallet: EdgeCurrencyWallet,
+  legacyQuote: EdgeCoinExchangeQuote
+): EdgeExchangeQuote {
+  const quoteUri = 'https://shapeshift.io/#/status/' + legacyQuote.orderId
+
+  const out: EdgeExchangeQuote = {
+    expirationDate: new Date(legacyQuote.expiration),
+    fromNativeAmount: legacyQuote.depositAmountNative,
+    toNativeAmount: legacyQuote.withdrawalAmountNative,
+
+    exchangeService: 'shapeshift',
+    quoteId: legacyQuote.orderId,
+    quoteUri,
+
+    async approve (): Promise<EdgeTransaction> {
+      const signedTransaction = await fromWallet.signTx(
+        legacyQuote.edgeTransacton
+      )
+      const broadcastedTransaction = await fromWallet.broadcastTx(
+        signedTransaction
+      )
+      await fromWallet.saveTx(signedTransaction)
+
+      return broadcastedTransaction
+    },
+
+    async close () {
+      close(this)
+    }
+  }
+  bridgifyObject(out)
+
+  return out
 }

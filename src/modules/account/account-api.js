@@ -11,8 +11,11 @@ import type {
   EdgeDataStore,
   EdgeExchangeCache,
   EdgeExchangeCurrencies,
+  EdgeExchangeQuote,
+  EdgeExchangeQuoteOptions,
   EdgeLobby,
   EdgePluginData,
+  EdgeSpendInfo,
   EdgeWalletInfo,
   EdgeWalletInfoFull,
   EdgeWalletStates,
@@ -22,7 +25,7 @@ import { signEthereumTransaction } from '../../util/crypto/external.js'
 import { base58 } from '../../util/encoding.js'
 import { getCurrencyPlugin } from '../currency/currency-selectors.js'
 import { makeExchangeCache } from '../exchange/exchange-api.js'
-import { makeShapeshiftApi } from '../exchange/shapeshift.js'
+import { makeShapeshiftApi, upgradeQuote } from '../exchange/shapeshift.js'
 import {
   createCurrencyWallet,
   findFirstKey,
@@ -333,6 +336,31 @@ export function makeAccountApi (
       const out = {}
       for (const cc of shapeshiftTokens) out[cc] = { exchanges: ['shapeshift'] }
       return out
+    },
+    async getExchangeQuote (
+      opts: EdgeExchangeQuoteOptions
+    ): Promise<EdgeExchangeQuote> {
+      const { fromWallet, nativeAmount, quoteFor } = opts
+
+      // Hit the legacy API:
+      const spendInfo: EdgeSpendInfo = {
+        currencyCode: opts.fromCurrencyCode,
+        quoteFor,
+        nativeAmount,
+        spendTargets: [
+          {
+            destWallet: opts.toWallet,
+            currencyCode: opts.toCurrencyCode
+          }
+        ]
+      }
+      if (quoteFor === 'to') {
+        spendInfo.spendTargets[0].nativeAmount = nativeAmount
+      }
+      const legacyQuote = await fromWallet.getQuote(spendInfo)
+
+      // Convert that to the new format:
+      return upgradeQuote(fromWallet, legacyQuote)
     }
   }
   bridgifyObject(out)
