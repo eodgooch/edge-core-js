@@ -10,6 +10,7 @@ import type {
   EdgeCurrencyWallet,
   EdgeDataStore,
   EdgeExchangeCache,
+  EdgeExchangeCurrencies,
   EdgeLobby,
   EdgePluginData,
   EdgeWalletInfo,
@@ -21,6 +22,7 @@ import { signEthereumTransaction } from '../../util/crypto/external.js'
 import { base58 } from '../../util/encoding.js'
 import { getCurrencyPlugin } from '../currency/currency-selectors.js'
 import { makeExchangeCache } from '../exchange/exchange-api.js'
+import { makeShapeshiftApi } from '../exchange/shapeshift.js'
 import {
   createCurrencyWallet,
   findFirstKey,
@@ -81,6 +83,8 @@ export function makeAccountApi (
   const dataStore = makeDataStoreApi(ai, accountId)
   const pluginData = makePluginDataApi(dataStore)
   const storageWalletApi = makeStorageWalletApi(ai, accountWalletInfo)
+
+  const shapeshiftApi = makeShapeshiftApi(ai)
 
   function lockdown () {
     if (ai.props.state.hideKeys) {
@@ -322,6 +326,13 @@ export function makeAccountApi (
         throw new Error('Cannot find the requested private key in the account')
       }
       return signEthereumTransaction(walletInfo.keys.ethereumKey, transaction)
+    },
+
+    async getExchangeCurrencies (): Promise<EdgeExchangeCurrencies> {
+      const shapeshiftTokens = await shapeshiftApi.getAvailableExchangeTokens()
+      const out = {}
+      for (const cc of shapeshiftTokens) out[cc] = { exchanges: ['shapeshift'] }
+      return out
     }
   }
   bridgifyObject(out)

@@ -400,6 +400,12 @@ export type EdgePluginData = {
   setItem(pluginId: string, itemId: string, value: string): Promise<mixed>
 }
 
+export type EdgeExchangeCurrencies = {
+  [currencyCode: string]: {
+    exchanges: Array<string>
+  }
+}
+
 export type EdgeAccountEvents = {}
 
 export type EthererumTransaction = {
@@ -505,7 +511,10 @@ export type EdgeAccount = {
   signEthereumTransaction(
     walletId: string,
     transaction: EthererumTransaction
-  ): Promise<string>
+  ): Promise<string>,
+
+  // Exchange support:
+  getExchangeCurrencies(): Promise<EdgeExchangeCurrencies>
 }
 
 // edge login types ---------------------------------------------------
