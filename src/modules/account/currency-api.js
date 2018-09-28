@@ -5,7 +5,8 @@ import { Bridgeable } from 'yaob'
 import type {
   EdgeCurrencyInfo,
   EdgeCurrencyPlugin,
-  EdgeCurrencyTools
+  EdgeCurrencyTools,
+  EdgeExchangeTools
 } from '../../edge-core-index.js'
 import type { ApiInput } from '../root.js'
 import { changePluginSettings } from './account-files.js'
@@ -40,5 +41,30 @@ export class CurrencyTools extends Bridgeable<EdgeCurrencyTools> {
       this._plugin,
       settings
     )
+  }
+}
+
+export class ExchangeTools extends Bridgeable<EdgeExchangeTools> {
+  _settings: Object
+
+  constructor () {
+    super()
+    this._settings = {}
+  }
+
+  get exchangeInfo () {
+    return {
+      pluginName: 'shapeshift',
+      exchangeName: 'ShapeShift',
+      homepage: 'https://shapeshift.io/'
+    }
+  }
+
+  get settings (): Object {
+    return this._settings
+  }
+
+  async changeSettings (settings: Object): Promise<mixed> {
+    this._settings = settings
   }
 }

@@ -13,6 +13,7 @@ import type {
   EdgeExchangeCurrencies,
   EdgeExchangeQuote,
   EdgeExchangeQuoteOptions,
+  EdgeExchangeTools,
   EdgeLobby,
   EdgePluginData,
   EdgeSpendInfo,
@@ -46,6 +47,7 @@ import { changeRecovery, deleteRecovery } from '../login/recovery2.js'
 import type { ApiInput } from '../root.js'
 import { makeStorageWalletApi } from '../storage/storage-api.js'
 import { changeWalletStates } from './account-files.js'
+import { ExchangeTools } from './currency-api.js'
 import { makeDataStoreApi, makePluginDataApi } from './data-store-api.js'
 import { makeLobbyApi } from './lobby-api.js'
 
@@ -82,6 +84,9 @@ export function makeAccountApi (
   const selfState = () => ai.props.state.accounts[accountId]
   const { accountWalletInfo, loginType } = selfState()
 
+  const exchangeTools = {
+    shapeshift: new ExchangeTools()
+  }
   const exchangeCache = makeExchangeCache(ai)
   const dataStore = makeDataStoreApi(ai, accountId)
   const pluginData = makePluginDataApi(dataStore)
@@ -149,6 +154,9 @@ export function makeAccountApi (
     // Speciality API's:
     get currencyTools (): EdgeCurrencyToolsMap {
       return currencyTools
+    },
+    get exchangeTools (): { [pluginName: string]: EdgeExchangeTools } {
+      return exchangeTools
     },
     get exchangeCache (): EdgeExchangeCache {
       return exchangeCache

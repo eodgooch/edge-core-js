@@ -363,6 +363,15 @@ export type EdgeCurrencyToolsMap = {
   [pluginName: string]: EdgeCurrencyTools
 }
 
+export type EdgeExchangeTools = {
+  +watch: Subscriber<EdgeExchangeTools>,
+
+  +exchangeInfo: Object,
+  +settings: Object,
+
+  changeSettings(settings: Object): Promise<mixed>
+}
+
 export type EdgeExchangeCacheEvents = {
   update: mixed
 }
@@ -465,6 +474,7 @@ export type EdgeAccount = {
 
   // Special-purpose API's:
   +currencyTools: EdgeCurrencyToolsMap,
+  +exchangeTools: { [pluginName: string]: EdgeExchangeTools },
   +exchangeCache: any,
   +dataStore: EdgeDataStore,
   +pluginData: EdgePluginData, // Deprecated
