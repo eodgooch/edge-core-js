@@ -145,6 +145,7 @@ export type EdgeContextOptions = {
   path?: string, // Only used on node.js
   plugins?: Array<EdgeCorePluginFactory>,
   shapeshiftKey?: string,
+  shapeshiftBearerToken?: string,
 
   // Used by the fake context:
   localFakeUser?: boolean,

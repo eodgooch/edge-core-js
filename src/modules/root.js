@@ -46,6 +46,7 @@ export type RootProps = {
   +output: RootOutput,
   +plugins: Array<EdgeCorePluginFactory>,
   +shapeshiftKey: string | void,
+  +shapeshiftBearerToken: string | void,
   +state: RootState
 }
 
@@ -75,7 +76,8 @@ export function makeCoreRoot (io: EdgeIo, opts: EdgeContextOptions) {
     callbacks = {},
     hideKeys = false,
     plugins = [],
-    shapeshiftKey = void 0
+    shapeshiftKey = void 0,
+    shapeshiftBearerToken = void 0
   } = opts
   const { onError = onErrorDefault, onExchangeUpdate = nop } = callbacks
 
@@ -110,7 +112,8 @@ export function makeCoreRoot (io: EdgeIo, opts: EdgeContextOptions) {
         },
         onExchangeUpdate,
         plugins,
-        shapeshiftKey
+        shapeshiftKey,
+        shapeshiftBearerToken
       })
     ),
     e => console.error(e),

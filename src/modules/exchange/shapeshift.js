@@ -40,6 +40,7 @@ export type ShapeShiftExactQuoteReply = {
 export function makeShapeshiftApi (ai: ApiInput) {
   const io = ai.props.io
   const apiKey = ai.props.shapeshiftKey
+  const bearerToken = ai.props.shapeshiftBearerToken
 
   const api = {
     async get (path) {
@@ -62,7 +63,8 @@ export function makeShapeshiftApi (ai: ApiInput) {
         method: 'POST',
         headers: {
           Accept: 'application/json, text/plain, */*',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${bearerToken}`
         },
         body: JSON.stringify(body)
       })
